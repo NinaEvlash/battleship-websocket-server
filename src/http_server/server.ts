@@ -3,11 +3,13 @@ import { httpServer } from './index';
 import { handleRegistration } from './handlers/handleRegistration';
 import { handleCreateRoom } from './handlers/handleCreateRoom';
 import { broadcastUpdateRooms } from './handlers/broadcastUpdateRooms';
+import { handleAddUserToRoom } from './handlers/handleAddUserToRoom';
 
 const wss = new WebSocketServer({ server: httpServer });
 const users = new Map();
 const activeUsers = new Map();
 const rooms = new Map();
+const games = new Map();
 let indexNextUser = { value: 1 };
 
 wss.on('connection', (ws) => {
@@ -17,6 +19,7 @@ wss.on('connection', (ws) => {
     try {
       const msg = JSON.parse(message.toString());
       let data = msg.data;
+      console.log(data);
       if (typeof data === 'string' && data !== '') {
         try {
           data = JSON.parse(data);
@@ -30,6 +33,9 @@ wss.on('connection', (ws) => {
         broadcastUpdateRooms(wss, rooms);
       } else if (msg.type === 'create_room' && msg.id === 0) {
         handleCreateRoom(ws, rooms, activeUsers);
+        broadcastUpdateRooms(wss, rooms);
+      } else if (msg.type === 'add_user_to_room' && msg.id === 0) {
+        handleAddUserToRoom(ws, data.indexRoom, rooms, activeUsers, games);
         broadcastUpdateRooms(wss, rooms);
       }
     } catch (err) {

@@ -12,3 +12,18 @@ export type Room = {
   roomId: string;
   users: ConnectedUser[];
 };
+
+export type GamePlayer = {
+  idPlayer: string;
+  ws: WebSocket;
+  name: string;
+  index: number;
+  ships: any[] | null;
+  ready: boolean;
+};
+
+export type Game = {
+  gameId: string;
+  players: GamePlayer[];
+  currentTurn: string;
+};
