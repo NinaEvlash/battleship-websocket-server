@@ -15,6 +15,5 @@ export function handleCreateRoom(
     users: [user],
   };
   rooms.set(roomId, newRoom);
-  console.log(`NewRoom: ${newRoom}`);
   return newRoom;
 }

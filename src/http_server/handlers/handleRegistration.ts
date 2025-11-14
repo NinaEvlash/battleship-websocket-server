@@ -39,8 +39,6 @@ export function handleRegistration(
     const newUser = { password, index: nextIndexRef.value++ };
     users.set(name, newUser);
     activeUsers.set(ws, { name, index: newUser.index, ws });
-    console.log(`Users: ${users}`);
-    console.log(`ActiveUsers: ${activeUsers}`);
     sendJSON(ws, {
       type: 'reg',
       data: { name, index: newUser.index, error: false, errorText: '' },

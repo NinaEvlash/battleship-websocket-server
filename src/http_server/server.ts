@@ -2,6 +2,7 @@ import { WebSocketServer } from 'ws';
 import { httpServer } from './index';
 import { handleRegistration } from './handlers/handleRegistration';
 import { handleCreateRoom } from './handlers/handleCreateRoom';
+import { broadcastUpdateRooms } from './handlers/broadcastUpdateRooms';
 
 const wss = new WebSocketServer({ server: httpServer });
 const users = new Map();
@@ -16,7 +17,7 @@ wss.on('connection', (ws) => {
     try {
       const msg = JSON.parse(message.toString());
       let data = msg.data;
-      if (typeof data === 'string') {
+      if (typeof data === 'string' && data !== '') {
         try {
           data = JSON.parse(data);
         } catch (e) {
@@ -26,9 +27,10 @@ wss.on('connection', (ws) => {
 
       if (msg.type === 'reg' && msg.id === 0) {
         handleRegistration(ws, data, users, activeUsers, indexNextUser);
+        broadcastUpdateRooms(wss, rooms);
       } else if (msg.type === 'create_room' && msg.id === 0) {
-        const room = handleCreateRoom(ws, rooms, activeUsers);
-        console.log(room);
+        handleCreateRoom(ws, rooms, activeUsers);
+        broadcastUpdateRooms(wss, rooms);
       }
     } catch (err) {
       console.error('Error processing message:', err);
