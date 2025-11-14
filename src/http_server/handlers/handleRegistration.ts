@@ -1,5 +1,5 @@
 import type { WebSocket } from 'ws';
-import { sendJSON } from './sendJSON';
+import { sendJSON } from '../utils/sendJSON';
 import { User, ConnectedUser } from '../utils/types';
 
 export function handleRegistration(
