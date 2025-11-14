@@ -1,11 +1,12 @@
 import type { WebSocket } from 'ws';
-
-type User = { password: string; index: number };
+import { sendJSON } from './sendJSON';
+import { User, ConnectedUser } from '../utils/types';
 
 export function handleRegistration(
   ws: WebSocket,
   data: { name: string; password: string },
   users: Map<string, User>,
+  activeUsers: Map<WebSocket, ConnectedUser>,
   nextIndexRef: { value: number }
 ) {
   const { name, password } = data;
@@ -37,19 +38,13 @@ export function handleRegistration(
   } else {
     const newUser = { password, index: nextIndexRef.value++ };
     users.set(name, newUser);
+    activeUsers.set(ws, { name, index: newUser.index, ws });
+    console.log(`Users: ${users}`);
+    console.log(`ActiveUsers: ${activeUsers}`);
     sendJSON(ws, {
       type: 'reg',
       data: { name, index: newUser.index, error: false, errorText: '' },
       id: 0,
     });
   }
-}
-
-function sendJSON(ws: WebSocket, obj: any) {
-  if (obj.data && typeof obj.data === 'object') {
-    obj.data = JSON.stringify(obj.data);
-  }
-
-  console.log('Sending to client:', obj);
-  ws.send(JSON.stringify(obj));
 }
