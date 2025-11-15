@@ -27,3 +27,17 @@ export type Game = {
   players: GamePlayer[];
   currentTurn: string;
 };
+
+export type ShipPosition = {
+  x: number;
+  y: number;
+};
+
+export type ShipType = 'small' | 'medium' | 'large' | 'huge';
+
+export type Ship = {
+  position: ShipPosition;
+  direction: boolean;
+  type: ShipType;
+  length: number;
+};
