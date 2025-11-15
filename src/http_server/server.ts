@@ -20,7 +20,7 @@ wss.on('connection', (ws) => {
     try {
       const msg = JSON.parse(message.toString());
       let data = msg.data;
-      console.log(data);
+      //console.log(data);
       if (typeof data === 'string' && data !== '') {
         try {
           data = JSON.parse(data);

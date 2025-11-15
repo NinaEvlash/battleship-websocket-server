@@ -1,67 +1,49 @@
-import { Game, Ship } from '../utils/types';
-import { findGameAndPlayer } from '../utils/find';
+import { Game, GamePlayer, AddShipsData } from '../utils/types';
 import { sendJSON } from '../utils/sendJSON';
+import { broadcastTurn } from './broadcastTurn';
 
-export function handleAddShips(
-  data: { gameId: string; ships: Ship[]; idPlayer?: string; indexPlayer?: string },
-  games: Map<string, Game>
-) {
-  if (!data) {
-    console.error('handleAddShips: empty data');
-    return;
-  }
-  const { gameId, ships } = data;
-  const idPlayer = data.idPlayer || data.indexPlayer;
+export function handleAddShips(data: AddShipsData, games: Map<any, Game>) {
+  const { gameId, ships, indexPlayer } = data;
 
-  if (!gameId) {
-    console.error('handleAddShips: missing gameId', data);
-    return;
-  }
-  if (!idPlayer) {
-    console.error('handleAddShips: missing player id (idPlayer/indexPlayer)', data);
+  if (!games.has(gameId)) {
+    console.error('Game not found:', gameId);
     return;
   }
 
-  const resultFind = findGameAndPlayer(games, gameId, idPlayer);
-  if (!resultFind) {
-    console.error(
-      `handleAddShips: game or player not found. gameId=${gameId}, idPlayer=${idPlayer}`
-    );
+  const game = games.get(gameId)!;
+
+  if (!game.players[indexPlayer]) {
+    console.error('Player not found in game:', indexPlayer);
     return;
   }
-  const { game, player } = resultFind;
 
+  const player: GamePlayer = game.players[indexPlayer];
   player.ships = ships;
   player.ready = true;
 
-  console.log(`Player ${idPlayer} set ships for game ${gameId}`);
+  console.log(`Player ${indexPlayer} added ships for game ${gameId}`);
 
-  const isReady = game.players.every((p) => p.ready);
+  const playerIds = Object.keys(game.players);
 
-  if (isReady) {
-    const firstPlayerIndex = player.idPlayer;
+  console.log('Game started:', gameId);
 
-    game.players.forEach((p) => {
-      sendJSON(p.ws, {
-        type: 'start_game',
-        data: {
-          ships: p.ships,
-          currentPlayerIndex: firstPlayerIndex,
-        },
-        id: 0,
-      });
-    });
+  const firstTurn = Math.random() < 0.5 ? playerIds[0] : playerIds[1];
+  game.currentTurn = String(firstTurn);
 
-    game.currentTurn = String(firstPlayerIndex);
+  for (const pid of playerIds) {
+    const p = game.players[pid];
 
-    game.players.forEach((p) => {
-      sendJSON(p.ws, {
-        type: 'turn',
-        data: { currentPlayer: game.currentTurn },
-        id: 0,
-      });
-    });
+    const msg = {
+      type: 'start_game',
+      data: {
+        ships: p.ships,
+        currentPlayerIndex: pid,
+      },
+      id: 0,
+    };
 
-    console.log(`Game ${gameId} started. currentTurn=${game.currentTurn}`);
+    sendJSON(p.ws, msg);
   }
+
+  broadcastTurn(game);
 }

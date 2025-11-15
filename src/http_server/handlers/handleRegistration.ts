@@ -23,6 +23,7 @@ export function handleRegistration(
 
   if (existing) {
     if (existing.password === password) {
+      activeUsers.set(ws, { name, index: existing.index, ws });
       sendJSON(ws, {
         type: 'reg',
         data: { name, index: existing.index, error: false, errorText: '' },

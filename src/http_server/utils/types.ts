@@ -23,21 +23,20 @@ export type GamePlayer = {
 };
 
 export type Game = {
-  gameId: string;
-  players: GamePlayer[];
-  currentTurn: string;
+  gameId: number | string;
+  players: Record<string, GamePlayer>;
+  currentTurn: string | null;
 };
 
-export type ShipPosition = {
-  x: number;
-  y: number;
+export type AddShipsData = {
+  gameId: number | string;
+  ships: Ship[];
+  indexPlayer: number | string;
 };
-
-export type ShipType = 'small' | 'medium' | 'large' | 'huge';
 
 export type Ship = {
-  position: ShipPosition;
+  position: { x: number; y: number };
   direction: boolean;
-  type: ShipType;
   length: number;
+  type: 'small' | 'medium' | 'large' | 'huge';
 };
