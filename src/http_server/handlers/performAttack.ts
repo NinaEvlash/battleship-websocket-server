@@ -35,6 +35,18 @@ export function performAttack(game: Game, indexPlayer: string, x: number, y: num
   sendJSON(player.ws, msg);
   sendJSON(enemy.ws, msg);
 
+  const enemyShipsRemaining = (enemy.ships || []).some((ship) => (ship.hits || 0) < ship.length);
+  if (!enemyShipsRemaining) {
+    const finishMsg = {
+      type: 'finish',
+      data: { winPlayer: indexPlayer },
+      id: 0,
+    };
+    sendJSON(player.ws, finishMsg);
+    sendJSON(enemy.ws, finishMsg);
+    return;
+  }
+
   if (status === 'miss') {
     game.currentTurn = enemyId;
     broadcastTurn(game);
