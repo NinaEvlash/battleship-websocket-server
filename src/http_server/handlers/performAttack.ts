@@ -1,8 +1,15 @@
 import { Game } from '../utils/types';
 import { sendJSON } from '../utils/sendJSON';
 import { broadcastTurn } from './broadcastTurn';
+import { broadcastWinners } from './broadcastWinners';
 
-export function performAttack(game: Game, indexPlayer: string, x: number, y: number) {
+export function performAttack(
+  game: Game,
+  indexPlayer: string,
+  x: number,
+  y: number,
+  winners: Map<string, number>
+) {
   const player = game.players[indexPlayer];
   const enemyId = Object.keys(game.players).find((id) => id !== indexPlayer)!;
   const enemy = game.players[enemyId];
@@ -37,6 +44,13 @@ export function performAttack(game: Game, indexPlayer: string, x: number, y: num
 
   const enemyShipsRemaining = (enemy.ships || []).some((ship) => (ship.hits || 0) < ship.length);
   if (!enemyShipsRemaining) {
+    // Обновляем таблицу побед
+    const playerName = player.name;
+    winners.set(playerName, (winners.get(playerName) || 0) + 1);
+
+    // Отправляем сообщение игрокам
+    const allClients = Object.values(game.players).map((p) => p.ws);
+    broadcastWinners(allClients, winners);
     const finishMsg = {
       type: 'finish',
       data: { winPlayer: indexPlayer },

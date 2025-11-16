@@ -2,7 +2,11 @@ import { AttackData, Game } from '../utils/types';
 import { sendJSON } from '../utils/sendJSON';
 import { performAttack } from './performAttack';
 
-export function handleAttack(data: AttackData, games: Map<string, Game>) {
+export function handleAttack(
+  data: AttackData,
+  games: Map<string, Game>,
+  winners: Map<string, number>
+) {
   const { gameId, x, y, indexPlayer } = data;
 
   const game = games.get(String(gameId));
@@ -30,5 +34,5 @@ export function handleAttack(data: AttackData, games: Map<string, Game>) {
   if (!player.shots) player.shots = new Set<string>();
   player.shots.add(key);
 
-  performAttack(game, String(indexPlayer), x, y);
+  performAttack(game, String(indexPlayer), x, y, winners);
 }

@@ -7,12 +7,14 @@ import { handleAddUserToRoom } from './handlers/handleAddUserToRoom';
 import { handleAddShips } from './handlers/handleAddShips';
 import { handleAttack } from './handlers/handleAttack';
 import { handleRandomAttack } from './handlers/handleRandomAttack';
+import { broadcastWinners } from './handlers/broadcastWinners';
 
 const wss = new WebSocketServer({ server: httpServer });
 const users = new Map();
 const activeUsers = new Map();
 const rooms = new Map();
 const games = new Map();
+const winners = new Map();
 let indexNextUser = { value: 1 };
 
 wss.on('connection', (ws) => {
@@ -35,6 +37,10 @@ wss.on('connection', (ws) => {
           if (msg.id === 0) {
             handleRegistration(ws, data, users, activeUsers, indexNextUser);
             broadcastUpdateRooms(wss, rooms);
+            broadcastWinners(
+              Array.from(activeUsers.values()).map((u) => u.ws),
+              winners
+            );
           }
           break;
 
@@ -42,6 +48,10 @@ wss.on('connection', (ws) => {
           if (msg.id === 0) {
             handleCreateRoom(ws, rooms, activeUsers);
             broadcastUpdateRooms(wss, rooms);
+            broadcastWinners(
+              Array.from(activeUsers.values()).map((u) => u.ws),
+              winners
+            );
           }
           break;
 
@@ -57,11 +67,11 @@ wss.on('connection', (ws) => {
           break;
 
         case 'attack':
-          handleAttack(data, games);
+          handleAttack(data, games, winners);
           break;
 
         case 'randomAttack':
-          handleRandomAttack(data, games);
+          handleRandomAttack(data, games, winners);
           break;
       }
     } catch (err) {

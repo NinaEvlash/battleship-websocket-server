@@ -2,7 +2,11 @@ import { RandomAttackData, Game } from '../utils/types';
 import { sendJSON } from '../utils/sendJSON';
 import { performAttack } from './performAttack';
 
-export function handleRandomAttack(data: RandomAttackData, games: Map<string, Game>) {
+export function handleRandomAttack(
+  data: RandomAttackData,
+  games: Map<string, Game>,
+  winners: Map<string, number>
+) {
   const { gameId, indexPlayer } = data;
 
   const game = games.get(String(gameId));
@@ -40,5 +44,5 @@ export function handleRandomAttack(data: RandomAttackData, games: Map<string, Ga
 
   player.shots.add(key);
 
-  performAttack(game, String(indexPlayer), x, y);
+  performAttack(game, String(indexPlayer), x, y, winners);
 }
