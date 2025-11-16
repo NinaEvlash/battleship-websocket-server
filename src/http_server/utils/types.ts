@@ -34,11 +34,9 @@ export type AddShipsData = {
   indexPlayer: number | string;
 };
 
-export type Direction = 'horizontal' | 'vertical';
-
 export type Ship = {
   position: { x: number; y: number };
-  direction: Direction;
+  direction: boolean;
   length: number;
   type: 'small' | 'medium' | 'large' | 'huge';
 };

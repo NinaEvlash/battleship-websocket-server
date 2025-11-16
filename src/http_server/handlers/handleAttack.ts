@@ -37,12 +37,13 @@ export function handleAttack(data: AttackData, games: Map<string, Game>) {
 
   for (const ship of enemy.ships || []) {
     for (let i = 0; i < ship.length; i++) {
-      const px = ship.position.x + (ship.direction === 'horizontal' ? i : 0);
-      const py = ship.position.y + (ship.direction === 'vertical' ? i : 0);
+      const px = ship.direction ? ship.position.x : ship.position.x + i;
+      const py = ship.direction ? ship.position.y + i : ship.position.y;
 
       if (px === x && py === y) {
         ship.hits = (ship.hits || 0) + 1;
         status = ship.hits === ship.length ? 'killed' : 'shot';
+        break;
       }
     }
   }
