@@ -1,0 +1,68 @@
+import { Game } from '../utils/types';
+import { sendJSON } from '../utils/sendJSON';
+import { broadcastTurn } from './broadcastTurn';
+import { broadcastWinners } from './broadcastWinners';
+
+export function performAttack(
+  game: Game,
+  indexPlayer: string,
+  x: number,
+  y: number,
+  winners: Map<string, number>
+) {
+  const player = game.players[indexPlayer];
+  const enemyId = Object.keys(game.players).find((id) => id !== indexPlayer)!;
+  const enemy = game.players[enemyId];
+
+  let status: 'miss' | 'shot' | 'killed' = 'miss';
+
+  for (const ship of enemy.ships || []) {
+    for (let i = 0; i < ship.length; i++) {
+      const px = ship.direction ? ship.position.x : ship.position.x + i;
+      const py = ship.direction ? ship.position.y + i : ship.position.y;
+
+      if (px === x && py === y) {
+        ship.hits = (ship.hits || 0) + 1;
+        status = ship.hits === ship.length ? 'killed' : 'shot';
+        break;
+      }
+    }
+  }
+
+  const msg = {
+    type: 'attack',
+    data: {
+      position: { x, y },
+      currentPlayer: indexPlayer,
+      status,
+    },
+    id: 0,
+  };
+
+  sendJSON(player.ws, msg);
+  sendJSON(enemy.ws, msg);
+
+  const enemyShipsRemaining = (enemy.ships || []).some((ship) => (ship.hits || 0) < ship.length);
+  if (!enemyShipsRemaining) {
+    const playerName = player.name;
+    winners.set(playerName, (winners.get(playerName) || 0) + 1);
+
+    const allClients = Object.values(game.players).map((p) => p.ws);
+    broadcastWinners(allClients, winners);
+    const finishMsg = {
+      type: 'finish',
+      data: { winPlayer: indexPlayer },
+      id: 0,
+    };
+    sendJSON(player.ws, finishMsg);
+    sendJSON(enemy.ws, finishMsg);
+    return;
+  }
+
+  if (status === 'miss') {
+    game.currentTurn = enemyId;
+    broadcastTurn(game);
+  }
+
+  return status;
+}
