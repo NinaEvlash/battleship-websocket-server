@@ -44,11 +44,9 @@ export function performAttack(
 
   const enemyShipsRemaining = (enemy.ships || []).some((ship) => (ship.hits || 0) < ship.length);
   if (!enemyShipsRemaining) {
-    // Обновляем таблицу побед
     const playerName = player.name;
     winners.set(playerName, (winners.get(playerName) || 0) + 1);
 
-    // Отправляем сообщение игрокам
     const allClients = Object.values(game.players).map((p) => p.ws);
     broadcastWinners(allClients, winners);
     const finishMsg = {
