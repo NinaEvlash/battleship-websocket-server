@@ -5,7 +5,7 @@ export function broadcastTurn(game: Game) {
   const msg = {
     type: 'turn',
     data: {
-      currentPlayer: Number(game.currentTurn),
+      currentPlayer: game.currentTurn,
     },
     id: 0,
   };

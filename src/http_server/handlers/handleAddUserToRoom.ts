@@ -13,12 +13,24 @@ export function handleAddUserToRoom(
   const room = rooms.get(indexRoom);
   if (!room) return console.log('Room not found');
 
-  const secondUser = activeUsers.get(ws);
-  if (!secondUser) return;
+  const user = activeUsers.get(ws);
+  if (!user) return;
 
-  room.users.push(secondUser);
+  const userAlreadyInRoom = room.users.some((u) => u.index === user.index);
+  if (userAlreadyInRoom) {
+    console.log(`User ${user.name} already in room ${indexRoom}`);
+    return;
+  }
+
+  room.users.push(user);
+  console.log('Room', room);
+
+  if (room.users.length < 2) {
+    console.log('Waiting for second player to join room:', indexRoom);
+    return;
+  }
+
   rooms.delete(indexRoom);
-
   const gameId = generateId();
 
   const id1 = generateId();

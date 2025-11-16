@@ -5,6 +5,7 @@ import { handleCreateRoom } from './handlers/handleCreateRoom';
 import { broadcastUpdateRooms } from './handlers/broadcastUpdateRooms';
 import { handleAddUserToRoom } from './handlers/handleAddUserToRoom';
 import { handleAddShips } from './handlers/handleAddShips';
+import { handleAttack } from './handlers/handleAttack';
 
 const wss = new WebSocketServer({ server: httpServer });
 const users = new Map();
@@ -20,7 +21,7 @@ wss.on('connection', (ws) => {
     try {
       const msg = JSON.parse(message.toString());
       let data = msg.data;
-      //console.log(data);
+      console.log(data);
       if (typeof data === 'string' && data !== '') {
         try {
           data = JSON.parse(data);
@@ -55,7 +56,7 @@ wss.on('connection', (ws) => {
           break;
 
         case 'attack':
-          //handleAttack(ws, data, games);
+          handleAttack(data, games);
           break;
 
         case 'randomAttack':

@@ -34,9 +34,18 @@ export type AddShipsData = {
   indexPlayer: number | string;
 };
 
+export type Direction = 'horizontal' | 'vertical';
+
 export type Ship = {
   position: { x: number; y: number };
-  direction: boolean;
+  direction: Direction;
   length: number;
   type: 'small' | 'medium' | 'large' | 'huge';
+};
+
+export type AttackData = {
+  gameId: string | number;
+  x: number;
+  y: number;
+  indexPlayer: string | number;
 };

@@ -23,6 +23,12 @@ export function handleAddShips(data: AddShipsData, games: Map<any, Game>) {
 
   console.log(`Player ${indexPlayer} added ships for game ${gameId}`);
 
+  const allReady = Object.values(game.players).every((p) => p.ready);
+  if (!allReady) {
+    console.log('Waiting for second player to add ships...');
+    return;
+  }
+
   const playerIds = Object.keys(game.players);
 
   console.log('Game started:', gameId);
