@@ -20,6 +20,7 @@ export type GamePlayer = {
   index: number;
   ships: any[] | null;
   ready: boolean;
+  shots?: Set<string>;
 };
 
 export type Game = {
@@ -45,5 +46,10 @@ export type AttackData = {
   gameId: string | number;
   x: number;
   y: number;
+  indexPlayer: string | number;
+};
+
+export type RandomAttackData = {
+  gameId: string | number;
   indexPlayer: string | number;
 };

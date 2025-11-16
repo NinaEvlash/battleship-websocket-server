@@ -6,6 +6,7 @@ import { broadcastUpdateRooms } from './handlers/broadcastUpdateRooms';
 import { handleAddUserToRoom } from './handlers/handleAddUserToRoom';
 import { handleAddShips } from './handlers/handleAddShips';
 import { handleAttack } from './handlers/handleAttack';
+import { handleRandomAttack } from './handlers/handleRandomAttack';
 
 const wss = new WebSocketServer({ server: httpServer });
 const users = new Map();
@@ -60,7 +61,7 @@ wss.on('connection', (ws) => {
           break;
 
         case 'randomAttack':
-          //handleRandomAttack(ws, data, games);
+          handleRandomAttack(data, games);
           break;
       }
     } catch (err) {
